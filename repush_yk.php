@@ -1836,7 +1836,7 @@ $data = '[
 
 
     function repush_data($kode,$date){
-
+        echo "task id 5 ".$kode." ".$date."\n";
 
         $curl = curl_init();
 
@@ -1862,12 +1862,14 @@ $data = '[
 
         $response = curl_exec($curl);
         $response = json_decode($response,true);
-        if($response['metadata']['message']="TaskId=4 belum ada"){
+        $message = $response['metadata']['message'];
+        echo json_encode($message)." resp task 5 \n";
+        if($message == "TaskId=4 belum ada"){
             repush_data4($kode,$date);
             repush_data($kode,$date);
         }else{
 
-            echo json_encode($response)."\n";
+            echo "resp : task 5 ".json_encode($response)."\n";
         }
 
 
@@ -1876,8 +1878,10 @@ $data = '[
 
 
     function repush_data4($kode,$date){
-        echo $kode." ".$date."\n";
-        $date = (int)$date-10000;
+        echo "task id 4 ".$kode." ".$date."\n";
+        // $date = (int)$date-10000;
+        // $date = (int)$date*1000;
+
 
         $curl = curl_init();
 
@@ -1901,10 +1905,21 @@ $data = '[
             ),
         ));
 
-        $response = curl_exec($curl);   
+        $response = curl_exec($curl);
+        $response = json_decode($response,true);
+        $message_error = $response['metadata']['message'];
 
-        echo json_encode($response)."\n";
+        if(strpos($message_error, 'lebih besar dari pada TaskId=4')) {
+          $date_task_3 = strtotime(substr($message_error, 16, 19));
+          $date_task_3 = strtotime('+5 minutes', $date_task_3);
+          
+          echo $date_task_3." - debug ".substr($message_error, 16, 19)." - ". $message_error ."\n";
+          repush_data4($kode, (int)$date_task_3*1000);
 
+        }else {
+          echo "resp : task 4". json_encode($response)."\n";
+        }
+       
         curl_close($curl);
     }
   
