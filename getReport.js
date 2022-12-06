@@ -13,16 +13,22 @@ const fields = ['Appintment ID', 'Booking Code', 'Time Task 1', 'Time Task 2', '
         values[i]['Appintment ID'] = appt.appointment_id;
         values[i]['Booking Code'] = appt.booking_code;
         console.log('[start]', appt.booking_code)
-        try {
-            const resp = await getTaskListApi(appt.booking_code);
-            const list = resp.response && resp.response.list || [];
-            list.forEach(ls => {
-                values[i]['Time Task '+ ls.taskid] = ls.waktu;
-            });
-        }catch(er){
-            console.log('[error]', appt.booking_code, er.message)
-        }
-        
+       
+        await (new Promise(res => {
+            setTimeout(async () => {
+                try {                
+                    const resp = await getTaskListApi(appt.booking_code);
+                    const list = resp.response && resp.response.list || [];
+                    list.forEach(ls => {
+                        values[i]['Time Task '+ ls.taskid] = ls.waktu;
+                    });
+                    res()
+                }catch(er){
+                    console.log('[error]', appt.booking_code, er)
+                }
+            }, 1000)
+        }))                        
+               
     }));
     
     console.log('[start] create report')
